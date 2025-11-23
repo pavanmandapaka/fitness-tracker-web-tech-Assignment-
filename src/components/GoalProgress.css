@@ -1,7 +1,8 @@
+/* Flexible grid layout for goal cards - auto-fills available space with minimum 300px cards */
 .goals-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 12px;
+  gap: 16px;
 }
 
 .goal-card {

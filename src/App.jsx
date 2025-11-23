@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard';
 import WorkoutForm from './components/WorkoutForm';
 import MealForm from './components/MealForm';
 import GoalForm from './components/GoalForm';
+import WeightForm from './components/WeightForm';
 import { useFitnessData } from './hooks/useFitnessData';
 
 function App() {
@@ -41,6 +42,12 @@ function App() {
           >
             + Set Goal
           </button>
+          <button 
+            className="btn btn-primary"
+            onClick={() => openModal('weight')}
+          >
+            + Log Weight
+          </button>
         </div>
       </header>
 
@@ -66,6 +73,13 @@ function App() {
         <GoalForm 
           onClose={closeModal}
           onSave={fitnessData.addGoal}
+        />
+      )}
+
+      {activeModal === 'weight' && (
+        <WeightForm 
+          onClose={closeModal}
+          onSave={fitnessData.addWeightEntry}
         />
       )}
     </div>

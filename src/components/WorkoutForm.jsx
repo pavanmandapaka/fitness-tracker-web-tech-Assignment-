@@ -40,7 +40,7 @@ const WorkoutForm = ({ onClose, onSave }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>💪 Add Workout</h2>
+          <h2> Add Workout</h2>
           <button className="close-btn" onClick={onClose}>&times;</button>
         </div>
 
