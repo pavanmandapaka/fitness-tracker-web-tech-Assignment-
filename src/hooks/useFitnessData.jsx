@@ -19,25 +19,44 @@ const STORAGE_KEYS = {
  */
 export const useFitnessData = () => {
   // Initialize state with lazy loading from localStorage
-  // This pattern ensures data loads synchronously on first render
   const [workouts, setWorkouts] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.WORKOUTS);
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.WORKOUTS);
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error("Failed to parse workouts", e);
+      return [];
+    }
   });
   
   const [meals, setMeals] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.MEALS);
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.MEALS);
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error("Failed to parse meals", e);
+      return [];
+    }
   });
   
   const [goals, setGoals] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.GOALS);
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.GOALS);
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error("Failed to parse goals", e);
+      return [];
+    }
   });
   
   const [weightHistory, setWeightHistory] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.WEIGHT);
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.WEIGHT);
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error("Failed to parse weight history", e);
+      return [];
+    }
   });
 
   // Auto-save to localStorage whenever state changes
@@ -59,50 +78,43 @@ export const useFitnessData = () => {
 
   /**
    * Add a new workout entry
-   * @param {Object} workout - Workout data (type, duration, intensity, etc.)
+   * Enforces numeric types for calculations
    */
   const addWorkout = (workout) => {
     const newWorkout = {
       ...workout,
+      duration: parseInt(workout.duration) || 0,
+      caloriesBurned: parseInt(workout.caloriesBurned) || 0,
       id: Date.now(),
       date: workout.date || new Date().toISOString()
     };
     setWorkouts(prev => [newWorkout, ...prev]);
   };
 
-  /**
-   * Delete a workout by ID
-   * @param {number} id - Workout ID
-   */
   const deleteWorkout = (id) => {
     setWorkouts(prev => prev.filter(w => w.id !== id));
   };
 
   /**
    * Add a new meal entry
-   * @param {Object} meal - Meal data (name, calories, macros, etc.)
+   * Enforces numeric types for calculations
    */
   const addMeal = (meal) => {
     const newMeal = {
       ...meal,
+      calories: parseInt(meal.calories) || 0,
       id: Date.now(),
       date: meal.date || new Date().toISOString()
     };
     setMeals(prev => [newMeal, ...prev]);
   };
 
-  /**
-   * Delete a meal by ID
-   * @param {number} id - Meal ID
-   */
   const deleteMeal = (id) => {
     setMeals(prev => prev.filter(m => m.id !== id));
   };
 
   /**
    * Add a new weight entry and sort chronologically
-   * @param {number} weight - Weight value in kg
-   * @param {string} date - ISO date string (optional, defaults to today)
    */
   const addWeightEntry = (weight, date) => {
     const newEntry = {
@@ -117,14 +129,18 @@ export const useFitnessData = () => {
 
   /**
    * Add a new goal
-   * @param {Object} goal - Goal data (title, type, target, etc.)
+   * Initializes progress intelligently based on goal type
    */
   const addGoal = (goal) => {
+    const currentVal = parseFloat(goal.current) || 0;
     const newGoal = {
       ...goal,
+      target: parseFloat(goal.target),
+      current: currentVal,
       id: Date.now(),
       createdAt: new Date().toISOString(),
-      progress: 0
+      // For weight goals, progress starts at current weight. For others (e.g. run 100km), it starts at 0.
+      progress: goal.type === 'weight' ? currentVal : 0
     };
     setGoals(prev => [newGoal, ...prev]);
 
@@ -136,35 +152,29 @@ export const useFitnessData = () => {
 
   /**
    * Update progress for a specific goal
-   * @param {number} id - Goal ID
-   * @param {number} progress - New progress value
    */
   const updateGoalProgress = (id, progress) => {
+    const numericProgress = parseFloat(progress);
     setGoals(prev => 
       prev.map(goal => 
-        goal.id === id ? { ...goal, progress } : goal
+        goal.id === id ? { ...goal, progress: numericProgress } : goal
       )
     );
 
     // Sync with weight history if it's a weight goal
     const goal = goals.find(g => g.id === id);
     if (goal && goal.type === 'weight') {
-      addWeightEntry(progress);
+      addWeightEntry(numericProgress);
     }
   };
 
-  /**
-   * Delete a goal by ID
-   * @param {number} id - Goal ID
-   */
   const deleteGoal = (id) => {
     setGoals(prev => prev.filter(g => g.id !== id));
   };
 
   /**
    * Calculate total calories consumed
-   * @param {Date} dateFilter - Optional date to filter by specific day
-   * @returns {number} Total calories
+   * Uses Number() casting to be safe against legacy string data
    */
   const getTotalCalories = (dateFilter = null) => {
     let filteredMeals = meals;
@@ -173,13 +183,12 @@ export const useFitnessData = () => {
         new Date(m.date).toDateString() === new Date(dateFilter).toDateString()
       );
     }
-    return filteredMeals.reduce((sum, meal) => sum + (meal.calories || 0), 0);
+    return filteredMeals.reduce((sum, meal) => sum + (Number(meal.calories) || 0), 0);
   };
 
   /**
    * Calculate total calories burned from workouts
-   * @param {Date} dateFilter - Optional date to filter by specific day
-   * @returns {number} Total calories burned
+   * Uses Number() casting to be safe against legacy string data
    */
   const getTotalCaloriesBurned = (dateFilter = null) => {
     let filteredWorkouts = workouts;
@@ -188,13 +197,11 @@ export const useFitnessData = () => {
         new Date(w.date).toDateString() === new Date(dateFilter).toDateString()
       );
     }
-    return filteredWorkouts.reduce((sum, workout) => sum + (workout.caloriesBurned || 0), 0);
+    return filteredWorkouts.reduce((sum, workout) => sum + (Number(workout.caloriesBurned) || 0), 0);
   };
 
   /**
    * Calculate net calories (Consumed - Burned)
-   * @param {Date} dateFilter - Optional date to filter by specific day
-   * @returns {number} Net calories
    */
   const getNetCalories = (dateFilter = null) => {
     const consumed = getTotalCalories(dateFilter);
@@ -202,11 +209,6 @@ export const useFitnessData = () => {
     return consumed - burned;
   };
 
-  /**
-   * Calculate total number of workouts
-   * @param {Date} dateFilter - Optional date to filter by specific day
-   * @returns {number} Total workout count
-   */
   const getTotalWorkouts = (dateFilter = null) => {
     if (dateFilter) {
       return workouts.filter(w => 
@@ -216,12 +218,8 @@ export const useFitnessData = () => {
     return workouts.length;
   };
 
-  /**
-   * Calculate total workout duration in minutes
-   * @returns {number} Total minutes across all workouts
-   */
   const getTotalWorkoutMinutes = () => {
-    return workouts.reduce((sum, workout) => sum + (workout.duration || 0), 0);
+    return workouts.reduce((sum, workout) => sum + (Number(workout.duration) || 0), 0);
   };
 
   return {
