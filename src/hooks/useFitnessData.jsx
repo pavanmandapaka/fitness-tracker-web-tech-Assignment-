@@ -100,41 +100,6 @@ export const useFitnessData = () => {
   };
 
   /**
-   * Add a new goal
-   * @param {Object} goal - Goal data (title, type, target, etc.)
-   */
-  const addGoal = (goal) => {
-    const newGoal = {
-      ...goal,
-      id: Date.now(),
-      createdAt: new Date().toISOString(),
-      progress: 0
-    };
-    setGoals(prev => [newGoal, ...prev]);
-  };
-
-  /**
-   * Update progress for a specific goal
-   * @param {number} id - Goal ID
-   * @param {number} progress - New progress value
-   */
-  const updateGoalProgress = (id, progress) => {
-    setGoals(prev => 
-      prev.map(goal => 
-        goal.id === id ? { ...goal, progress } : goal
-      )
-    );
-  };
-
-  /**
-   * Delete a goal by ID
-   * @param {number} id - Goal ID
-   */
-  const deleteGoal = (id) => {
-    setGoals(prev => prev.filter(g => g.id !== id));
-  };
-
-  /**
    * Add a new weight entry and sort chronologically
    * @param {number} weight - Weight value in kg
    * @param {string} date - ISO date string (optional, defaults to today)
@@ -148,6 +113,52 @@ export const useFitnessData = () => {
     setWeightHistory(prev => [...prev, newEntry].sort((a, b) => 
       new Date(a.date) - new Date(b.date)
     ));
+  };
+
+  /**
+   * Add a new goal
+   * @param {Object} goal - Goal data (title, type, target, etc.)
+   */
+  const addGoal = (goal) => {
+    const newGoal = {
+      ...goal,
+      id: Date.now(),
+      createdAt: new Date().toISOString(),
+      progress: 0
+    };
+    setGoals(prev => [newGoal, ...prev]);
+
+    // Sync with weight history if it's a weight goal
+    if (goal.type === 'weight' && goal.current) {
+      addWeightEntry(goal.current);
+    }
+  };
+
+  /**
+   * Update progress for a specific goal
+   * @param {number} id - Goal ID
+   * @param {number} progress - New progress value
+   */
+  const updateGoalProgress = (id, progress) => {
+    setGoals(prev => 
+      prev.map(goal => 
+        goal.id === id ? { ...goal, progress } : goal
+      )
+    );
+
+    // Sync with weight history if it's a weight goal
+    const goal = goals.find(g => g.id === id);
+    if (goal && goal.type === 'weight') {
+      addWeightEntry(progress);
+    }
+  };
+
+  /**
+   * Delete a goal by ID
+   * @param {number} id - Goal ID
+   */
+  const deleteGoal = (id) => {
+    setGoals(prev => prev.filter(g => g.id !== id));
   };
 
   /**

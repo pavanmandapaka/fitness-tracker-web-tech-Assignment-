@@ -99,6 +99,7 @@ const GoalProgress = ({ goals, onUpdateProgress, onDeleteGoal }) => {
                     type="number"
                     value={progressValue}
                     onChange={(e) => setProgressValue(e.target.value)}
+                    onWheel={(e) => e.target.blur()}
                     placeholder="New progress"
                     className="progress-input"
                     step="0.1"

@@ -23,7 +23,12 @@ const WeightForm = ({ onClose, onSave }) => {
       return;
     }
 
-    onSave(formData.weight, formData.date);
+    // Use current timestamp if the date is today to ensure it appears last
+    // This fixes the issue where weight logged today might appear before other entries from today
+    const today = new Date().toISOString().split('T')[0];
+    const dateToSave = formData.date === today ? new Date().toISOString() : formData.date;
+
+    onSave(formData.weight, dateToSave);
     onClose();
   };
 
@@ -44,6 +49,7 @@ const WeightForm = ({ onClose, onSave }) => {
               name="weight"
               value={formData.weight}
               onChange={handleChange}
+              onWheel={(e) => e.target.blur()}
               placeholder="75.5"
               step="0.1"
               min="0"

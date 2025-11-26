@@ -86,6 +86,7 @@ const MealForm = ({ onClose, onSave }) => {
                 name="calories"
                 value={formData.calories}
                 onChange={handleChange}
+                onWheel={(e) => e.target.blur()}
                 placeholder="300"
                 min="0"
                 required
@@ -102,6 +103,7 @@ const MealForm = ({ onClose, onSave }) => {
                 name="protein"
                 value={formData.protein}
                 onChange={handleChange}
+                onWheel={(e) => e.target.blur()}
                 placeholder="20"
                 min="0"
               />
@@ -115,7 +117,8 @@ const MealForm = ({ onClose, onSave }) => {
                 name="carbs"
                 value={formData.carbs}
                 onChange={handleChange}
-                placeholder="30"
+                onWheel={(e) => e.target.blur()}
+                placeholder="40"
                 min="0"
               />
             </div>
@@ -128,6 +131,7 @@ const MealForm = ({ onClose, onSave }) => {
                 name="fats"
                 value={formData.fats}
                 onChange={handleChange}
+                onWheel={(e) => e.target.blur()}
                 placeholder="10"
                 min="0"
               />

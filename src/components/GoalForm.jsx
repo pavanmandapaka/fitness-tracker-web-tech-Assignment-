@@ -100,36 +100,7 @@ const GoalForm = ({ onClose, onSave }) => {
                 <option value="workouts">Workouts</option>
                 <option value="calories">Calories</option>
                 <option value="distance">Distance</option>
-                <option value="custom">Custom</option>
               </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="unit">Unit</label>
-              <input
-                type="text"
-                id="unit"
-                name="unit"
-                value={formData.unit}
-                onChange={handleChange}
-                placeholder="kg, km, etc."
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="current">Current Value</label>
-              <input
-                type="number"
-                id="current"
-                name="current"
-                value={formData.current}
-                onChange={handleChange}
-                placeholder="0"
-                min="0"
-                step="0.1"
-              />
             </div>
 
             <div className="form-group">
@@ -140,12 +111,26 @@ const GoalForm = ({ onClose, onSave }) => {
                 name="target"
                 value={formData.target}
                 onChange={handleChange}
-                placeholder="100"
-                min="0"
+                onWheel={(e) => e.target.blur()}
+                placeholder="e.g., 70"
                 step="0.1"
                 required
               />
             </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="current">Current Value (Optional)</label>
+            <input
+              type="number"
+              id="current"
+              name="current"
+              value={formData.current}
+              onChange={handleChange}
+              onWheel={(e) => e.target.blur()}
+              placeholder="e.g., 75"
+              step="0.1"
+            />
           </div>
 
           <div className="form-group">

@@ -67,6 +67,7 @@ const WorkoutForm = ({ onClose, onSave }) => {
                 name="duration"
                 value={formData.duration}
                 onChange={handleChange}
+                onWheel={(e) => e.target.blur()}
                 placeholder="30"
                 min="1"
                 required
@@ -81,6 +82,7 @@ const WorkoutForm = ({ onClose, onSave }) => {
                 name="caloriesBurned"
                 value={formData.caloriesBurned}
                 onChange={handleChange}
+                onWheel={(e) => e.target.blur()}
                 placeholder="200"
                 min="0"
               />
