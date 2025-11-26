@@ -177,6 +177,32 @@ export const useFitnessData = () => {
   };
 
   /**
+   * Calculate total calories burned from workouts
+   * @param {Date} dateFilter - Optional date to filter by specific day
+   * @returns {number} Total calories burned
+   */
+  const getTotalCaloriesBurned = (dateFilter = null) => {
+    let filteredWorkouts = workouts;
+    if (dateFilter) {
+      filteredWorkouts = workouts.filter(w => 
+        new Date(w.date).toDateString() === new Date(dateFilter).toDateString()
+      );
+    }
+    return filteredWorkouts.reduce((sum, workout) => sum + (workout.caloriesBurned || 0), 0);
+  };
+
+  /**
+   * Calculate net calories (Consumed - Burned)
+   * @param {Date} dateFilter - Optional date to filter by specific day
+   * @returns {number} Net calories
+   */
+  const getNetCalories = (dateFilter = null) => {
+    const consumed = getTotalCalories(dateFilter);
+    const burned = getTotalCaloriesBurned(dateFilter);
+    return consumed - burned;
+  };
+
+  /**
    * Calculate total number of workouts
    * @param {Date} dateFilter - Optional date to filter by specific day
    * @returns {number} Total workout count
@@ -212,6 +238,8 @@ export const useFitnessData = () => {
     deleteGoal,
     addWeightEntry,
     getTotalCalories,
+    getTotalCaloriesBurned,
+    getNetCalories,
     getTotalWorkouts,
     getTotalWorkoutMinutes
   };

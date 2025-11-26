@@ -20,11 +20,12 @@ const Dashboard = ({ fitnessData }) => {
     updateGoalProgress,
     deleteGoal,
     getTotalCalories,
+    getNetCalories,
     getTotalWorkouts,
     getTotalWorkoutMinutes
   } = fitnessData;
 
-  const todayCalories = getTotalCalories(new Date());
+  const todayCalories = getNetCalories(new Date());
   const totalWorkouts = getTotalWorkouts();
   const totalMinutes = getTotalWorkoutMinutes();
   const currentWeight = weightHistory.length > 0 
@@ -45,7 +46,7 @@ const Dashboard = ({ fitnessData }) => {
             </div>
             <div className="hero-stat-item">
               <span className="hero-stat-value">{Math.round(todayCalories)}</span>
-              <span className="hero-stat-label">Calories</span>
+              <span className="hero-stat-label">Net Calories</span>
             </div>
             <div className="hero-stat-item">
               <span className="hero-stat-value">{totalMinutes}</span>
@@ -58,7 +59,7 @@ const Dashboard = ({ fitnessData }) => {
       {/* Stats Overview */}
       <div className="stats-grid">
         <StatsCard
-          title="Today's Calories"
+          title="Net Calories"
           value={todayCalories}
           unit="kcal"
           icon={<IoFlameSharp />}
